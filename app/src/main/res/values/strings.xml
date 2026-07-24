@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Hermes Companion</string>
+    <string name="channel_service_name">Hermes Background Service</string>
+    <string name="channel_service_description">Maintains connection to Hermes Brain</string>
+    <string name="channel_alert_name">Hermes Alerts</string>
+    <string name="channel_alert_description">Mission and agent status alerts</string>
+    <string name="notification_connected">Connected to Hermes Brain</string>
+    <string name="notification_disconnected">Disconnected from Hermes Brain</string>
+    <string name="notification_mission_active">Mission in progress: %1$s</string>
+    <string name="accessibility_service_description">Hermes Companion accessibility service for screen interaction and UI automation</string>
+    <string name="overlay_permission_required">Overlay permission is required for Hermes Companion</string>
+</resources>
