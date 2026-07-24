@@ -37,25 +37,25 @@
 
         <!-- WebSocket Background Service -->
         <service
-            android:name=".core.network.HermesWebSocketService"
+            android:name=".service.HermesWebSocketService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
 
         <!-- Overlay Service (system alerts) -->
         <service
-            android:name=".core.overlay.OverlayService"
+            android:name=".service.OverlayService"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
 
         <!-- Voice Service -->
         <service
-            android:name=".core.voice.VoiceService"
+            android:name=".service.VoiceService"
             android:exported="false"
             android:foregroundServiceType="microphone" />
 
         <!-- Accessibility Service -->
         <service
-            android:name=".core.accessibility.HermesAccessibilityService"
+            android:name=".service.HermesAccessibilityService"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
@@ -68,7 +68,7 @@
 
         <!-- Notification Listener Service -->
         <service
-            android:name=".core.notification.HermesNotificationService"
+            android:name=".service.HermesNotificationService"
             android:exported="true"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
@@ -78,7 +78,7 @@
 
         <!-- Media Projection Service -->
         <service
-            android:name=".core.media.HermesMediaProjectionService"
+            android:name=".service.HermesMediaProjectionService"
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
 
