@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,17 +48,22 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
 
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+
       - name: Build with Gradle
-        run: ./gradlew assembleDebug --no-daemon --info --stacktrace
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
         env:
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false"
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
+          ANDROID_HOME: /usr/local/lib/android/sdk
 
       - name: List build outputs
         if: always()
         run: |
+          echo "=== ANDROID_HOME=$ANDROID_HOME ==="
           echo "=== Build outputs ==="
           find app/build/outputs -type f 2>/dev/null || echo "No build outputs found"
-          echo "=== APK path check ==="
+          echo "=== APK check ==="
           ls -la app/build/outputs/apk/debug/ 2>/dev/null || echo "No APK directory"
 
       - name: Upload build log
@@ -62,8 +71,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: |
-            app/build/outputs/
+          path: app/build/outputs/
           retention-days: 14
 
       - name: Upload Debug APK
@@ -80,6 +88,10 @@ jobs:
     timeout-minutes: 15
     needs: build
 
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -102,6 +114,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -112,12 +127,15 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Run unit tests
-        run: ./gradlew testDebugUnitTest --no-daemon --info --stacktrace
+        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
+          ANDROID_HOME: /usr/local/lib/android/sdk
 
-      - name: Upload test log
+      - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-output
+          name: test-results
           path: app/build/reports/tests/
           retention-days: 14
