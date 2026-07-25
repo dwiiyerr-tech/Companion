@@ -1,39 +1,48 @@
-1|package com.hermes.companion.ui.screenmodel
-2|
-3|import androidx.lifecycle.ViewModel
-4|import kotlinx.coroutines.flow.MutableStateFlow
-5|import kotlinx.coroutines.flow.StateFlow
-6|import kotlinx.coroutines.flow.asStateFlow
-7|import kotlinx.coroutines.flow.update
-8|
-9|class PerformanceViewModel : ViewModel() {
-10|
-11|    private val _uiState = MutableStateFlow(PerformanceUiState())
-12|    val uiState: StateFlow<PerformanceUiState> = _uiState.asStateFlow()
-13|
-14|    init {
-15|        loadState()
-16|    }
-17|
-18|    private fun loadState() {
-19|        _uiState.update {
-20|            it.copy(
-21|                cpuUsage = 34f,
-22|                ramUsage = 62f,
-23|                ramTotal = 8f,
-24|                ramUsed = 5f,
-25|                batteryLevel = 78,
-26|                isCharging = false,
-27|                storageUsed = 64.2f,
-28|                storageTotal = 128f,
-29|                networkRx = 1.2f,
-30|                networkTx = 0.8f,
-31|                missionLatency = listOf(45f, 52f, 48f, 61f, 55f, 49f, 53f, 58f, 51f, 47f, 43f, 56f)
-32|            )
-33|        }
-34|    }
-35|
-36|    fun refresh() {
-37|        loadState()
-38|    }
-39|}
+package com.hermes.companion.ui.screenmodel
+
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+
+data class PerformanceUiState(
+    val cpuUsage: Float = 0f,
+    val ramUsage: Float = 0f,
+    val ramTotal: Float = 8f,
+    val ramUsed: Float = 0f,
+    val batteryLevel: Int = 0,
+    val isCharging: Boolean = false,
+    val storageUsed: Float = 0f,
+    val storageTotal: Float = 0f,
+    val networkRx: Float = 0f,
+    val networkTx: Float = 0f,
+    val missionLatency: List<Float> = emptyList()
+)
+
+class PerformanceViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(PerformanceUiState())
+    val uiState: StateFlow<PerformanceUiState> = _uiState.asStateFlow()
+
+    init { loadState() }
+
+    private fun loadState() {
+        _uiState.update {
+            it.copy(
+                cpuUsage = 34f,
+                ramUsage = 62f,
+                ramTotal = 8f,
+                ramUsed = 5f,
+                batteryLevel = 78,
+                isCharging = false,
+                storageUsed = 64.2f,
+                storageTotal = 128f,
+                networkRx = 1.2f,
+                networkTx = 0.8f,
+                missionLatency = listOf(45f, 52f, 48f, 61f, 55f, 49f, 53f, 58f, 51f, 47f, 43f, 56f)
+            )
+        }
+    }
+
+    fun refresh() { loadState() }
+}

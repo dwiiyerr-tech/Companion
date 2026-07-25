@@ -3,7 +3,7 @@ package com.hermes.companion.data.repository
 import com.hermes.companion.core.network.LogEvent
 import com.hermes.companion.core.network.LogExport
 import com.hermes.companion.core.network.LogFilter
-import com.hermes.companion.core.network.LogLevel
+import com.hermes.companion.core.domain.LogLevel
 import kotlinx.coroutines.flow.*
 import java.io.File
 import java.io.FileWriter
