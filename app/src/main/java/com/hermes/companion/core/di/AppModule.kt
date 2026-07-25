@@ -27,9 +27,9 @@ val appModule = module {
     // Koin will auto-inject constructor dependencies from repositoryModule
     viewModel { HomeViewModel() }
     viewModel { MissionViewModel() }
-    viewModel { AgentViewModel(get()) }
-    viewModel { MemoryViewModel(get()) }
-    viewModel { LogsViewModel(get()) }
+    viewModel { AgentViewModel() }
+    viewModel { MemoryViewModel() }
+    viewModel { LogsViewModel() }
     viewModel { BrowserViewModel() }
     viewModel { AndroidControlViewModel() }
     viewModel { PerformanceViewModel() }
