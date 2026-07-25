@@ -30,12 +30,15 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 34
-          build-tools-version: '34.0.0'
-          emulator: false
+          cmdline-tools-version: 'latest'
+          accept-android-sdk-licenses: true
+          packages: 'platforms;android-34 build-tools;34.0.0'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: gradle assembleDebug --no-daemon --stacktrace
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
         env:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false"
 
@@ -69,8 +72,12 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 34
-          build-tools-version: '34.0.0'
+          cmdline-tools-version: 'latest'
+          accept-android-sdk-licenses: true
+          packages: 'platforms;android-34 build-tools;34.0.0'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
 
       - name: Run unit tests
-        run: gradle testDebugUnitTest --no-daemon --stacktrace
+        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
