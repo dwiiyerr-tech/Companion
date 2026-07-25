@@ -225,7 +225,8 @@ private fun LogEntryItem(log: LogEntry) {
                         LogLevel.ERROR, LogLevel.CRITICAL -> StatusRed
                         LogLevel.WARNING -> StatusYellow
                         LogLevel.DEBUG -> StatusBlue
-                        LogLevel.INFO -> StatusGreen
+                        LogLevel.INFO -> StatusGreen,
+                        LogLevel.FATAL -> StatusRed
                     }
                     Box(
                         modifier = Modifier

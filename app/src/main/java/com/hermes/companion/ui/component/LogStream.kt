@@ -29,7 +29,8 @@ fun LogStream(
                 LogLevel.ERROR, LogLevel.CRITICAL -> MaterialTheme.colorScheme.error
                 LogLevel.WARNING -> Color(0xFFFFC107)
                 LogLevel.DEBUG -> MaterialTheme.colorScheme.onSurfaceVariant
-                LogLevel.INFO -> MaterialTheme.colorScheme.onSurface
+                LogLevel.INFO -> MaterialTheme.colorScheme.onSurface,
+                LogLevel.FATAL -> MaterialTheme.colorScheme.error
             }
 
             Row(

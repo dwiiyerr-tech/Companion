@@ -39,7 +39,7 @@ fun MissionScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { viewModel.showCreateMissionDialog = true },
+                onClick = { viewModel.openCreateMissionDialog() },
                 containerColor = HermesPurple
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Create Mission")

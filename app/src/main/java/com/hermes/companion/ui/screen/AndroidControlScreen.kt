@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermes.companion.ui.component.StatusBadge
-import com.hermes.companion.ui.component.StatusBadge.BadgeStatus
+import com.hermes.companion.ui.component.BadgeStatus
 import com.hermes.companion.ui.screenmodel.AndroidControlViewModel
 import com.hermes.companion.ui.screenmodel.ServiceStatus
 

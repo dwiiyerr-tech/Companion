@@ -26,7 +26,7 @@ val appModule = module {
     // ViewModels - use viewModel() for proper ViewModelStore lifecycle
     // Koin will auto-inject constructor dependencies from repositoryModule
     viewModel { HomeViewModel() }
-    viewModel { MissionViewModel(get()) }
+    viewModel { MissionViewModel() }
     viewModel { AgentViewModel(get()) }
     viewModel { MemoryViewModel(get()) }
     viewModel { LogsViewModel(get()) }

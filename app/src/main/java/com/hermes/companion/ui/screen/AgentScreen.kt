@@ -11,8 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.hermes.companion.ui.component.BadgeStatus
 import com.hermes.companion.ui.component.StatusBadge
-import com.hermes.companion.ui.component.StatusBadge.BadgeStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

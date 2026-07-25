@@ -21,6 +21,10 @@ class MissionViewModel : ViewModel() {
     var showCreateMissionDialog by mutableStateOf(false)
         private set
 
+    fun openCreateMissionDialog() {
+        showCreateMissionDialog = true
+    }
+
     fun selectMission(mission: MissionUi) {
         _uiState.update { it.copy(selectedMission = mission) }
     }
