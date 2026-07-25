@@ -1,5 +1,7 @@
 package com.hermes.companion.ui.screen
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,9 +12,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.hermes.companion.ui.component.BadgeStatus
 import com.hermes.companion.ui.component.StatusBadge
+import com.hermes.companion.ui.screenmodel.MissionStatus
+import com.hermes.companion.ui.screenmodel.MissionViewModel
 import com.hermes.companion.ui.theme.HermesPurple
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,7 +54,6 @@ fun MissionScreen(
             // Tab Row
             ScrollableTabRow(
                 selectedTabIndex = selectedTab,
-                onTabSelected = { selectedTab = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -114,21 +120,29 @@ fun MissionScreen(
 
 @Composable
 private fun MissionCard(
-    mission: MissionSummary,
+    mission: MissionViewModel.MissionUi,
     onClick: () -> Unit
 ) {
+    val badgeStatus = when (mission.status) {
+        MissionStatus.RUNNING -> BadgeStatus.SUCCESS
+        MissionStatus.QUEUED -> BadgeStatus.INFO
+        MissionStatus.COMPLETED -> BadgeStatus.SUCCESS
+        MissionStatus.FAILED -> BadgeStatus.ERROR
+        MissionStatus.PAUSED -> BadgeStatus.WARNING
+        MissionStatus.CANCELLED -> BadgeStatus.NEUTRAL
+    }
+
     val statusColor = when (mission.status) {
         MissionStatus.RUNNING -> MaterialTheme.colorScheme.primary
         MissionStatus.QUEUED -> MaterialTheme.colorScheme.tertiary
-        MissionStatus.COMPLETED -> MaterialTheme.colorScheme.success
+        MissionStatus.COMPLETED -> MaterialTheme.colorScheme.primary
         MissionStatus.FAILED -> MaterialTheme.colorScheme.error
-        MissionStatus.PAUSED -> MaterialTheme.colorScheme.warning
-        else -> MaterialTheme.colorScheme.onSurfaceVariant
+        MissionStatus.PAUSED -> MaterialTheme.colorScheme.tertiary
+        MissionStatus.CANCELLED -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
             .fillMaxWidth()
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
@@ -142,17 +156,17 @@ private fun MissionCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(mission.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                StatusBadge(text = mission.status.name, color = statusColor)
+                StatusBadge(status = badgeStatus, text = mission.status.name)
             }
             Spacer(Modifier.height(8.dp))
-            Text(mission.goal, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(mission.message ?: mission.step ?: "", style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Spacer(Modifier.height(12.dp))
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.Start
             ) {
                 LinearProgressIndicator(
-                    progress = mission.progress,
+                    progress = { mission.progress },
                     modifier = Modifier.fillMaxWidth().height(6.dp),
                     color = statusColor
                 )
@@ -166,7 +180,7 @@ private fun MissionCard(
                         style = MaterialTheme.typography.labelSmall
                     )
                     Text(
-                        "${mission.agents.size} agents",
+                        "${mission.agentTypes.size} agents",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -177,13 +191,13 @@ private fun MissionCard(
                     )
                 }
             }
-            if (mission.agents.isNotEmpty()) {
+            if (mission.agentTypes.isNotEmpty()) {
                 Spacer(Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    mission.agents.forEach { agent ->
+                    mission.agentTypes.forEach { agent ->
                         Chip(
                             onClick = {},
                             label = { Text(agent, style = MaterialTheme.typography.labelSmall) },

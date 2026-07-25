@@ -3,11 +3,16 @@ package com.hermes.companion.ui.screenmodel
 import androidx.lifecycle.ViewModel
 import com.hermes.companion.core.domain.LogEntry
 import com.hermes.companion.core.domain.LogLevel
-import com.hermes.companion.ui.screen.LogsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+
+data class LogsUiState(
+    val entries: List<LogEntry> = emptyList(),
+    val filterLevel: LogLevel? = null,
+    val autoScroll: Boolean = true
+)
 
 class LogsViewModel : ViewModel() {
 

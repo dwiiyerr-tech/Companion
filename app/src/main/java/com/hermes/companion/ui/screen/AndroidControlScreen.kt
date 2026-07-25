@@ -1,5 +1,3 @@
-package com.hermes.companion.ui.screen
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -7,10 +5,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermes.companion.ui.component.PerformanceGauge
 import com.hermes.companion.ui.theme.HermesPurple
+import com.hermes.companion.ui.theme.StatusGreen
+import com.hermes.companion.ui.theme.StatusYellow
+import com.hermes.companion.ui.component.StatusBadge
+import com.hermes.companion.ui.component.StatusBadge.BadgeStatus
+import com.hermes.companion.ui.screenmodel.ServiceStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,9 +57,9 @@ fun AndroidControlScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            InfoTile("Model", uiState.deviceInfo?.model ?: "Unknown", Icons.Filled.PhoneAndroid)
-                            InfoTile("OS", "Android ${uiState.deviceInfo?.androidVersion ?: "?"}", Icons.Filled.Info)
-                            InfoTile("Battery", "${uiState.batteryLevel ?: 0}%", Icons.Filled.BatteryFull)
+                            InfoTile("Model", uiState.deviceModel, Icons.Filled.PhoneAndroid)
+                            InfoTile("OS", "Android ${uiState.androidVersion}", Icons.Filled.Info)
+                            InfoTile("Battery", "${uiState.batteryLevel}%", Icons.Filled.BatteryFull)
                         }
                     }
                 }
@@ -70,15 +76,15 @@ fun AndroidControlScreen(
                 ) {
                     ServiceCard(
                         title = "Accessibility",
-                        status = uiState.accessibilityStatus,
+                        status = getAccessibilityStatus(uiState.accessibilityEnabled),
                         icon = Icons.Filled.TouchApp,
                         onToggle = { viewModel.toggleAccessibility() }
                     )
                     ServiceCard(
                         title = "Notifications",
-                        status = uiState.notificationStatus,
+                        status = getNotificationStatus(uiState.notificationServiceEnabled),
                         icon = Icons.Filled.Notifications,
-                        onToggle = { viewModel.toggleNotifications() }
+                        onToggle = { viewModel.toggleNotificationService() }
                     )
                 }
             }
@@ -89,13 +95,13 @@ fun AndroidControlScreen(
                 ) {
                     ServiceCard(
                         title = "Media Projection",
-                        status = uiState.mediaProjectionStatus,
+                        status = getMediaProjectionStatus(uiState.mediaProjectionActive),
                         icon = Icons.Filled.ScreenShare,
                         onToggle = { viewModel.toggleMediaProjection() }
                     )
                     ServiceCard(
                         title = "Clipboard",
-                        status = uiState.clipboardStatus,
+                        status = getClipboardStatus(uiState.clipboardStatus),
                         icon = Icons.Filled.ContentPaste,
                         onToggle = { viewModel.toggleClipboard() }
                     )
@@ -167,9 +173,9 @@ private fun ServiceCard(
     onToggle: () -> Unit
 ) {
     val color = when (status) {
-        ServiceStatus.ENABLED -> MaterialTheme.colorScheme.success
+        ServiceStatus.ENABLED -> StatusGreen
         ServiceStatus.DISABLED -> MaterialTheme.colorScheme.onSurfaceVariant
-        ServiceStatus.REQUESTING -> MaterialTheme.colorScheme.warning
+        ServiceStatus.REQUESTING -> StatusYellow
         ServiceStatus.ERROR -> MaterialTheme.colorScheme.error
     }
 
@@ -195,11 +201,12 @@ private fun ServiceCard(
                 )
             }
             Spacer(Modifier.height(4.dp))
-            Text(
-                status.name,
-                style = MaterialTheme.typography.labelSmall,
-                color = color
-            )
+            StatusBadge(status = when (status) {
+                ServiceStatus.ENABLED -> BadgeStatus.SUCCESS
+                ServiceStatus.DISABLED -> BadgeStatus.DISABLED
+                ServiceStatus.REQUESTING -> BadgeStatus.INFO
+                ServiceStatus.ERROR -> BadgeStatus.ERROR
+            }, text = status.name)
         }
     }
 }
@@ -241,7 +248,24 @@ private fun PermissionRow(name: String, granted: Boolean, description: String) {
         Icon(
             if (granted) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
             contentDescription = null,
-            tint = if (granted) MaterialTheme.colorScheme.success else MaterialTheme.colorScheme.error
+            tint = if (granted) StatusGreen else MaterialTheme.colorScheme.error
         )
     }
+}
+
+// Helper functions to convert boolean state to ServiceStatus enum
+private fun getAccessibilityStatus(enabled: Boolean): ServiceStatus {
+    return if (enabled) ServiceStatus.ENABLED else ServiceStatus.DISABLED
+}
+
+private fun getNotificationStatus(enabled: Boolean): ServiceStatus {
+    return if (enabled) ServiceStatus.ENABLED else ServiceStatus.DISABLED
+}
+
+private fun getMediaProjectionStatus(active: Boolean): ServiceStatus {
+    return if (active) ServiceStatus.ENABLED else ServiceStatus.DISABLED
+}
+
+private fun getClipboardStatus(clipboard: Boolean): ServiceStatus {
+    return if (clipboard) ServiceStatus.ENABLED else ServiceStatus.DISABLED
 }

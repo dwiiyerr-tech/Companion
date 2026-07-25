@@ -1,7 +1,9 @@
 package com.hermes.companion.ui.screenmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.hermes.companion.data.repository.MissionRepository
 import kotlinx.coroutines.flow.*
 
 /**
@@ -9,9 +11,27 @@ import kotlinx.coroutines.flow.*
  *
  * Tracks running missions, mission history, queues, and mission progress.
  */
-class MissionViewModel(
-    private val missionRepository: MissionRepository
-) : ViewModel() {
+class MissionViewModel : ViewModel() {
+
+    // ── Unified UI State ───────────────────────────────────
+
+    private val _uiState = MutableStateFlow(MissionScreenUiState())
+    val uiState: StateFlow<MissionScreenUiState> = _uiState.asStateFlow()
+
+    var showCreateMissionDialog by mutableStateOf(false)
+        private set
+
+    fun selectMission(mission: MissionUi) {
+        _uiState.update { it.copy(selectedMission = mission) }
+    }
+
+    fun dismissMissionDialog() {
+        showCreateMissionDialog = false
+    }
+
+    fun dismissSelectedMission() {
+        _uiState.update { it.copy(selectedMission = null) }
+    }
 
     // ── Mission State ─────────────────────────────────────
 
@@ -35,14 +55,23 @@ class MissionViewModel(
 
     // ── Mission Lists ──────────────────────────────────────
 
-    private val _runningMissions = mutableStateOf<List<MissionUi>>(emptyList())
+    private val _runningMissions = MutableStateFlow<List<MissionUi>>(emptyList())
     val runningMissions: StateFlow<List<MissionUi>> = _runningMissions.asStateFlow()
 
-    private val _missionHistory = mutableStateOf<List<MissionUi>>(emptyList())
+    private val _missionHistory = MutableStateFlow<List<MissionUi>>(emptyList())
     val missionHistory: StateFlow<List<MissionUi>> = _missionHistory.asStateFlow()
 
-    private val _missionQueues = mutableStateOf<List<MissionQueue>>(emptyList())
+    private val _missionQueues = MutableStateFlow<List<MissionQueue>>(emptyList())
     val missionQueues: StateFlow<List<MissionQueue>> = _missionQueues.asStateFlow()
+
+    data class MissionScreenUiState(
+        val runningMissions: List<MissionUi> = emptyList(),
+        val queuedMissions: List<MissionUi> = emptyList(),
+        val completedMissions: List<MissionUi> = emptyList(),
+        val failedMissions: List<MissionUi> = emptyList(),
+        val showCreateMissionDialog: Boolean = false,
+        val selectedMission: MissionUi? = null
+    )
 
     data class MissionUi(
         val id: String,

@@ -27,7 +27,7 @@ fun WorkflowCanvas(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("Workflow", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                StatusBadge(text = "${nodes.size} blocks", color = MaterialTheme.colorScheme.primary)
+                StatusBadge(status = BadgeStatus.INFO, text = "${nodes.size} blocks")
             }
             Spacer(Modifier.height(12.dp))
 
@@ -52,7 +52,7 @@ fun WorkflowCanvas(
                     val cx = spacing * index + spacing / 2
                     val cy = size.height / 2
                     drawCircle(
-                        color = if (node.active) MaterialTheme.colorScheme().primary else MaterialTheme.colorScheme().outlineVariant,
+                        color = if (node.active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
                         radius = 16.dp.toPx(),
                         center = Offset(cx, cy)
                     )
@@ -74,7 +74,7 @@ fun WorkflowCanvas(
                         node.label,
                         fontSize = 9.sp,
                         maxLines = 1,
-                        color = if (node.active) MaterialTheme.colorScheme().onSurface else MaterialTheme.colorScheme().onSurfaceVariant
+                        color = if (node.active) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

@@ -10,6 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.hermes.companion.ui.screenmodel.MemoryViewModel
+import com.hermes.companion.ui.screenmodel.MemoryItem
+import com.hermes.companion.ui.screenmodel.MemoryTab
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -17,7 +21,7 @@ fun MemoryScreen(
     viewModel: MemoryViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedTab by remember { mutableStateOf(MemoryTab.SHORT_TERM) }
     val tabs = listOf("Short Term", "Long Term", "Semantic", "Knowledge Graph")
     var searchText by remember { mutableStateOf("") }
 
@@ -50,9 +54,12 @@ fun MemoryScreen(
             )
 
             // Tabs
-            ScrollableTabRow(selectedTabIndex = selectedTab) {
+            ScrollableTabRow(selectedTabIndex = selectedTab.ordinal) {
                 tabs.forEachIndexed { index, tab ->
-                    Tab(selected = index == selectedTab, onClick = { selectedTab = index }, text = { Text(tab) })
+                    Tab(selected = index == selectedTab.ordinal, onClick = { 
+                        selectedTab = MemoryTab.values()[index]
+                        viewModel.selectTab(selectedTab)
+                    }, text = { Text(tab) })
                 }
             }
 
@@ -98,8 +105,3 @@ private fun MemoryCard(memory: MemoryEntry) {
         }
     }
 }
-
-private data class MemoryEntry(
-    val id: String, val type: String, val content: String,
-    val timestamp: String, val relevance: Float = 0f
-)

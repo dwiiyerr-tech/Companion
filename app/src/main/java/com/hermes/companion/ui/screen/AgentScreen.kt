@@ -12,10 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.hermes.companion.ui.component.StatusBadge
+import com.hermes.companion.ui.component.StatusBadge.BadgeStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AgentScreen() {
+fun AgentScreen(
+    onNavigateToAndroidControl: () -> Unit = {},
+    onNavigateToBrowser: () -> Unit = {}
+) {
     val agents = remember {
         listOf(
             AgentData("Planner", "Idle", 0.12f, 0.25f, null, Icons.Filled.AccountTree),
@@ -73,12 +77,12 @@ private fun AgentCard(agent: AgentData) {
                     Text(agent.currentTask ?: "No task", style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                val statusColor = when (agent.status) {
-                    "Active" -> MaterialTheme.colorScheme.primary
-                    "Idle" -> MaterialTheme.colorScheme.tertiary
-                    else -> MaterialTheme.colorScheme.error
+                val badgeStatus = when (agent.status) {
+                    "Active" -> BadgeStatus.SUCCESS
+                    "Idle" -> BadgeStatus.INFO
+                    else -> BadgeStatus.DISABLED
                 }
-                StatusBadge(text = agent.status, color = statusColor)
+                StatusBadge(status = badgeStatus, text = agent.status)
             }
             if (agent.status != "Offline") {
                 Spacer(Modifier.height(10.dp))

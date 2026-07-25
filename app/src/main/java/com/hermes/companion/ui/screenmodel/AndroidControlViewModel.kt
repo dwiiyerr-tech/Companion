@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+enum class ServiceStatus { ENABLED, DISABLED, REQUESTING, ERROR }
+
 data class SensorData(
     val name: String,
     val type: String,
@@ -33,6 +35,7 @@ data class AndroidControlUiState(
     val accessibilityEnabled: Boolean = false,
     val notificationServiceEnabled: Boolean = false,
     val mediaProjectionActive: Boolean = false,
+    val clipboardStatus: Boolean = false,
     val sensors: List<SensorData> = emptyList(),
     val permissions: List<PermissionData> = emptyList()
 )
@@ -84,6 +87,10 @@ class AndroidControlViewModel : ViewModel() {
 
     fun toggleMediaProjection() {
         _uiState.update { it.copy(mediaProjectionActive = !it.mediaProjectionActive) }
+    }
+
+    fun toggleClipboard() {
+        _uiState.update { it.copy(clipboardStatus = !it.clipboardStatus) }
     }
 
     fun takeScreenshot() {

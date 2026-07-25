@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.hermes.companion.ui.theme.StatusGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +48,7 @@ fun PluginsScreen() {
                         }
                         Column(horizontalAlignment = Alignment.End) {
                             Switch(checked = plugin.enabled, onCheckedChange = null)
-                            Text("Installed", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.success)
+                            Text("Installed", style = MaterialTheme.typography.labelSmall, color = StatusGreen)
                         }
                     }
                 }

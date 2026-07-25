@@ -14,7 +14,9 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ToolsScreen() {
+fun ToolsScreen(
+    onNavigateToPlugins: () -> Unit = {}
+) {
     val tools = remember {
         listOf(
             ToolEntry("Web Search", "Search the web", true, "web"),

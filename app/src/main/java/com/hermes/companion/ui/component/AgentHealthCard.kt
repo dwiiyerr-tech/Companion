@@ -31,13 +31,13 @@ fun AgentHealthCard(
                     Text(type, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 StatusBadge(
-                    text = status,
-                    color = when (status) {
-                        "Active" -> MaterialTheme.colorScheme.primary
-                        "Idle" -> MaterialTheme.colorScheme.tertiary
-                        "Error" -> MaterialTheme.colorScheme.error
-                        else -> MaterialTheme.colorScheme.onSurfaceVariant
-                    }
+                    status = when (status) {
+                        "Active" -> BadgeStatus.SUCCESS
+                        "Idle" -> BadgeStatus.INFO
+                        "Error" -> BadgeStatus.ERROR
+                        else -> BadgeStatus.NEUTRAL
+                    },
+                    text = status
                 )
             }
             Spacer(Modifier.height(8.dp))
