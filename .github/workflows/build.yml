@@ -13,10 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    env:
-      ANDROID_HOME: /usr/local/lib/android/sdk
-      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,14 +26,25 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Verify SDK setup
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls -la "$ANDROID_HOME" 2>/dev/null || echo "SDK dir not found"
+          ls "$ANDROID_HOME/platforms/" 2>/dev/null || echo "No platforms"
+          ls "$ANDROID_HOME/build-tools/" 2>/dev/null || echo "No build-tools"
+
       - name: Accept SDK licenses
         run: yes | sdkmanager --licenses > /dev/null 2>&1 || true
 
       - name: Install SDK platforms and build tools
         run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
+      - name: Write local.properties
+        run: echo "sdk.dir=${ANDROID_HOME}" > local.properties
+
+      - name: Verify local.properties
+        run: cat local.properties
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
@@ -48,31 +55,14 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
 
-      - name: Write local.properties
-        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
-
       - name: Build with Gradle
         run: ./gradlew assembleDebug --no-daemon --stacktrace
-        env:
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
-          ANDROID_HOME: /usr/local/lib/android/sdk
 
       - name: List build outputs
         if: always()
         run: |
-          echo "=== ANDROID_HOME=$ANDROID_HOME ==="
           echo "=== Build outputs ==="
           find app/build/outputs -type f 2>/dev/null || echo "No build outputs found"
-          echo "=== APK check ==="
-          ls -la app/build/outputs/apk/debug/ 2>/dev/null || echo "No APK directory"
-
-      - name: Upload build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-output
-          path: app/build/outputs/
-          retention-days: 14
 
       - name: Upload Debug APK
         if: success()
@@ -88,10 +78,6 @@ jobs:
     timeout-minutes: 15
     needs: build
 
-    env:
-      ANDROID_HOME: /usr/local/lib/android/sdk
-      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -111,11 +97,8 @@ jobs:
       - name: Install SDK platforms and build tools
         run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
       - name: Write local.properties
-        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+        run: echo "sdk.dir=${ANDROID_HOME}" > local.properties
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
@@ -128,9 +111,6 @@ jobs:
 
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
-        env:
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
-          ANDROID_HOME: /usr/local/lib/android/sdk
 
       - name: Upload test results
         if: always()
