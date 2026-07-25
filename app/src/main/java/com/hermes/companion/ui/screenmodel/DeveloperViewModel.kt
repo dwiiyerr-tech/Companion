@@ -1,18 +1,45 @@
 package com.hermes.companion.ui.screenmodel
 
 import androidx.lifecycle.ViewModel
-import com.hermes.companion.ui.screen.BusEvent
-import com.hermes.companion.ui.screen.EventLevel
-import com.hermes.companion.ui.screen.LogConsoleEntry
-import com.hermes.companion.ui.screen.MemoryInfoData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+enum class EventLevel(val color: androidx.compose.ui.graphics.Color) {
+    DEBUG(com.hermes.companion.ui.theme.StatusBlue),
+    INFO(com.hermes.companion.ui.theme.StatusGreen),
+    WARN(com.hermes.companion.ui.theme.StatusYellow),
+    ERROR(com.hermes.companion.ui.theme.StatusRed)
+}
+
+data class BusEvent(
+    val id: String,
+    val level: EventLevel,
+    val source: String,
+    val event: String,
+    val data: String,
+    val timestamp: Long,
+    val isExpanded: Boolean = false
+)
+
+data class LogConsoleEntry(
+    val id: String,
+    val level: EventLevel,
+    val message: String,
+    val timestamp: Long
+)
+
+data class MemoryInfoData(
+    val heapSize: String = "72",
+    val allocated: String = "48",
+    val freeMemory: String = "24",
+    val gcCount: Int = 0,
+    val lastGC: Long = 0L
+)
+
 data class DeveloperUiState(
     val outputLines: List<String> = listOf("Hermes Dev Mode v1.0", "Type 'help' for commands"),
     val consoleEntries: List<LogConsoleEntry> = emptyList(),
-    val eventStream: List<BusEvent> = emptyList(),
     val busEvents: List<BusEvent> = emptyList(),
     val memoryInfo: MemoryInfoData = MemoryInfoData(),
     val filterLevel: EventLevel? = null,

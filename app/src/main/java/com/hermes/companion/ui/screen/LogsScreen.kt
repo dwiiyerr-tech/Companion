@@ -60,6 +60,7 @@ fun LogsScreen(
                 StatusBadge(status = BadgeStatus.NEUTRAL, text = "All")
                 LogLevel.entries.forEach { level ->
                     val badgeStatus = when (level) {
+                        LogLevel.TRACE -> BadgeStatus.NEUTRAL
                         LogLevel.DEBUG -> BadgeStatus.INFO
                         LogLevel.INFO -> BadgeStatus.SUCCESS
                         LogLevel.WARNING -> BadgeStatus.WARNING

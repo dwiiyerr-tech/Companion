@@ -16,49 +16,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hermes.companion.ui.screenmodel.BusEvent
+import com.hermes.companion.ui.screenmodel.DeveloperViewModel
+import com.hermes.companion.ui.screenmodel.EventLevel
+import com.hermes.companion.ui.screenmodel.LogConsoleEntry
+import com.hermes.companion.ui.screenmodel.MemoryInfoData
 import com.hermes.companion.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-enum class EventLevel(val color: androidx.compose.ui.graphics.Color) {
-    DEBUG(StatusBlue), INFO(StatusGreen), WARN(StatusYellow), ERROR(StatusRed)
-}
-
-data class BusEvent(
-    val id: String,
-    val level: EventLevel,
-    val source: String,
-    val event: String,
-    val data: String,
-    val timestamp: Long,
-    val isExpanded: Boolean = false
-)
-
-data class MemoryInfo(
-    val label: String,
-    val value: String,
-    val unit: String = "",
-    val trend: Trend = Trend.UP
-)
-
-enum class Trend {
-    UP, DOWN, STEADY
-}
-
-data class LogConsoleEntry(
-    val id: String,
-    val level: EventLevel,
-    val message: String,
-    val timestamp: Long
-)
-
-data class MemoryInfoData(
-    val heapSize: String = "72",
-    val allocated: String = "48",
-    val freeMemory: String = "24",
-    val gcCount: Int = 0,
-    val lastGC: Long = 0L
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
