@@ -77,15 +77,15 @@ fun MemoryScreen(
 }
 
 @Composable
-private fun MemoryCard(memory: MemoryEntry) {
+private fun MemoryCard(memory: MemoryItem) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(14.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(memory.type, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                Text(memory.timestamp, style = MaterialTheme.typography.labelSmall)
+                Text(memory.description, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                Text(memory.timeAgo, style = MaterialTheme.typography.labelSmall)
             }
             Spacer(Modifier.height(8.dp))
             Text(memory.content, style = MaterialTheme.typography.bodyMedium, maxLines = 3)
