@@ -15,7 +15,9 @@ import com.hermes.companion.ui.theme.StatusGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PluginsScreen() {
+fun PluginsScreen(
+    onBack: () -> Unit = {}
+) {
     val installedPlugins = remember {
         listOf(
             PluginItem("weather-forecast", "v1.2", "Weather data provider", true, true),
@@ -25,7 +27,16 @@ fun PluginsScreen() {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Plugins", fontWeight = FontWeight.Bold) }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Plugins", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),

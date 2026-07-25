@@ -93,6 +93,14 @@ class AndroidControlViewModel : ViewModel() {
         _uiState.update { it.copy(clipboardStatus = !it.clipboardStatus) }
     }
 
+    fun loadSystemInfo() {
+        // System info is already loaded in init; refresh from device if available
+    }
+
+    fun refreshSensors() {
+        loadState()
+    }
+
     fun takeScreenshot() {
         // TODO: trigger screenshot via service
     }

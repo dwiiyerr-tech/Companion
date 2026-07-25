@@ -1,2 +1,4 @@
 # Prevent Gradle distribution from being tracked by Git
 !gradle/wrapper/gradle-wrapper.jar
+.gradle/
+build/
