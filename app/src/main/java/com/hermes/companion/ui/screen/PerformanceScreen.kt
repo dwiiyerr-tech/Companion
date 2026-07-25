@@ -356,14 +356,14 @@ private fun GaugeCard(
                         color = color.copy(alpha = 0.15f),
                         startAngle = -90f, sweepAngle = 360f, useCenter = false,
                         topLeft = center - androidx.compose.ui.geometry.Offset(radius, radius),
-                        size = androidx.compose.ui.unit.IntSize(radius.toInt() * 2, radius.toInt() * 2),
+                        size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
                         style = androidx.compose.ui.graphics.Stroke(width = 8.dp.toPx(), cap = StrokeCap.Round)
                     )
                     drawArc(
                         color = gaugeColor,
                         startAngle = -90f, sweepAngle = 360f * animatedProgress, useCenter = false,
                         topLeft = center - androidx.compose.ui.geometry.Offset(radius, radius),
-                        size = androidx.compose.ui.unit.IntSize(radius.toInt() * 2, radius.toInt() * 2),
+                        size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
                         style = androidx.compose.ui.graphics.Stroke(width = 8.dp.toPx(), cap = StrokeCap.Round)
                     )
                 }
