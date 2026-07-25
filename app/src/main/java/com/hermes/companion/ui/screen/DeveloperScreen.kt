@@ -12,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -51,6 +50,14 @@ data class LogConsoleEntry(
     val level: EventLevel,
     val message: String,
     val timestamp: Long
+)
+
+data class MemoryInfoData(
+    val heapSize: String = "72",
+    val allocated: String = "48",
+    val freeMemory: String = "24",
+    val gcCount: Int = 0,
+    val lastGC: Long = 0L
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -253,7 +260,7 @@ fun DeveloperScreen(
                                     selectedLabelColor = HermesPurpleLight
                                 )
                             )
-                            LogLevel.entries.forEach { level ->
+                            EventLevel.entries.forEach { level ->
                                 FilterChip(
                                     selected = state.filterLevel == level,
                                     onClick = { viewModel.filterLevel(level) },
@@ -499,8 +506,9 @@ private fun ApiEndpointCard(method: String, path: String, host: String, status: 
 
 private fun formatDuration(duration: Long): String {
     return when {
+        duration < 1000 -> "${duration}ms"
         duration < 60000 -> "${duration / 1000}s"
         duration < 3600000 -> "${duration / 60000}m"
-        else -> "${duration / 3600000}h ${duration % 3600000 / 60000}m"
+        else -> "${duration / 3600000}h"
     }
 }

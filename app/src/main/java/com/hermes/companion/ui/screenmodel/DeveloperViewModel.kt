@@ -1,9 +1,24 @@
 package com.hermes.companion.ui.screenmodel
 
 import androidx.lifecycle.ViewModel
+import com.hermes.companion.ui.screen.BusEvent
+import com.hermes.companion.ui.screen.EventLevel
+import com.hermes.companion.ui.screen.LogConsoleEntry
+import com.hermes.companion.ui.screen.MemoryInfoData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+
+data class DeveloperUiState(
+    val outputLines: List<String> = listOf("Hermes Dev Mode v1.0", "Type 'help' for commands"),
+    val consoleEntries: List<LogConsoleEntry> = emptyList(),
+    val eventStream: List<BusEvent> = emptyList(),
+    val busEvents: List<BusEvent> = emptyList(),
+    val memoryInfo: MemoryInfoData = MemoryInfoData(),
+    val filterLevel: EventLevel? = null,
+    val memoryInspectResult: String = "",
+    val apiInspectResult: String = ""
+)
 
 class DeveloperViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(DeveloperUiState())
@@ -12,9 +27,39 @@ class DeveloperViewModel : ViewModel() {
     private val _commandHistory = MutableStateFlow<List<String>>(emptyList())
     val commandHistory: StateFlow<List<String>> = _commandHistory.asStateFlow()
 
+    init {
+        loadMockData()
+    }
+
+    private fun loadMockData() {
+        _uiState.value = _uiState.value.copy(
+            consoleEntries = listOf(
+                LogConsoleEntry("c1", EventLevel.INFO, "System initialized", 0),
+                LogConsoleEntry("c2", EventLevel.DEBUG, "Agent planner ready", 5),
+                LogConsoleEntry("c3", EventLevel.WARN, "Slow response from brain", 120),
+                LogConsoleEntry("c4", EventLevel.ERROR, "Vision agent timeout", 300)
+            ),
+            busEvents = listOf(
+                BusEvent("e1", EventLevel.INFO, "System", "connected", "WebSocket connected", 100, false),
+                BusEvent("e2", EventLevel.DEBUG, "Brain", "heartbeat", "OK", 200, false),
+                BusEvent("e3", EventLevel.WARN, "Agent", "latency", "2.4s", 350, false),
+                BusEvent("e4", EventLevel.ERROR, "Vision", "timeout", "Agent timed out after 30s", 500, false)
+            ),
+            memoryInfo = MemoryInfoData(
+                heapSize = "72",
+                allocated = "48",
+                freeMemory = "24",
+                gcCount = 12,
+                lastGC = 45000L
+            )
+        )
+    }
+
     fun executeCommand(cmd: String) {
         _commandHistory.value = _commandHistory.value + cmd
-        _uiState.value = _uiState.value.copy(outputLines = _uiState.value.outputLines + cmd + "OK: executed")
+        _uiState.value = _uiState.value.copy(
+            outputLines = _uiState.value.outputLines + cmd + "OK: executed"
+        )
     }
 
     fun clearLog() {
@@ -24,17 +69,20 @@ class DeveloperViewModel : ViewModel() {
     fun sendDebugCommand(command: String) {
         executeCommand(command)
     }
+
+    fun filterLevel(level: EventLevel?) {
+        _uiState.value = _uiState.value.copy(filterLevel = level)
+    }
+
+    fun toggleEventExpanded(eventId: String) {
+        _uiState.value = _uiState.value.copy(
+            busEvents = _uiState.value.busEvents.map { event ->
+                if (event.id == eventId) event.copy(isExpanded = !event.isExpanded) else event
+            }
+        )
+    }
+
+    fun refresh() {
+        loadMockData()
+    }
 }
-
-data class DeveloperUiState(
-    val outputLines: List<String> = listOf("Hermes Dev Mode v1.0", "Type 'help' for commands"),
-    val eventStream: List<DevEvent> = emptyList(),
-    val memoryInspectResult: String = "",
-    val apiInspectResult: String = ""
-)
-
-data class DevEvent(
-    val timestamp: String,
-    val source: String,
-    val data: String
-)

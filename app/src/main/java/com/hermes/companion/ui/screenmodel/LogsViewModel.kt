@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.update
 data class LogsUiState(
     val entries: List<LogEntry> = emptyList(),
     val filterLevel: LogLevel? = null,
-    val autoScroll: Boolean = true
+    val autoScroll: Boolean = true,
+    val isLoading: Boolean = true
 )
 
 class LogsViewModel : ViewModel() {

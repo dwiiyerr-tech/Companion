@@ -65,7 +65,6 @@ fun LogsScreen(
                         LogLevel.WARNING -> BadgeStatus.WARNING
                         LogLevel.ERROR -> BadgeStatus.ERROR
                         LogLevel.CRITICAL -> BadgeStatus.ERROR
-                        LogLevel.FATAL -> BadgeStatus.ERROR
                     }
                     StatusBadge(status = badgeStatus, text = level.name)
                 }
