@@ -30,9 +30,6 @@ jobs:
         run: |
           yes | sdkmanager --licenses > /dev/null 2>&1 || true
           sdkmanager "platforms;android-34" "build-tools;34.0.0"
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          ls -la "$ANDROID_HOME/platforms/" 2>/dev/null || echo "MISSING"
-          ls -la "$ANDROID_HOME/build-tools/" 2>/dev/null || echo "MISSING"
 
       - name: Write local.properties
         run: echo "sdk.dir=${ANDROID_HOME}" > local.properties
@@ -47,16 +44,20 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
+        run: |
+          set -o pipefail
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
 
-      - name: Show APK
+      - name: Find and show APK
         if: always()
         run: |
-          find app/build/outputs -name "*.apk" 2>/dev/null
-          ls -la app/build/outputs/apk/debug/ 2>/dev/null || echo "No APK"
+          echo "=== Searching for APK ==="
+          find . -name "*.apk" -type f 2>/dev/null
+          echo "=== app/build/outputs ==="
+          find app/build/outputs -type f 2>/dev/null || echo "No build outputs"
 
-      - name: Upload build.log on failure
-        if: failure()
+      - name: Upload build log
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build-log
@@ -68,7 +69,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: hermes-companion-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
           retention-days: 30
 
   test:
@@ -107,20 +111,14 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Run unit tests
-        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace 2>&1 | tee test.log
+        run: |
+          set -o pipefail
+          ./gradlew testDebugUnitTest --no-daemon --stacktrace 2>&1 | tee test.log
 
-      - name: Upload test.log on failure
-        if: failure()
+      - name: Upload test log
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-log
           path: test.log
-          retention-days: 14
-
-      - name: Upload test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-reports
-          path: app/build/reports/tests/
           retention-days: 14
