@@ -1,15 +1,2 @@
-*.iml
-.gradle/
-build/
-local.properties
-.idea/
-.DS_Store
-captures
-.externalNativeBuild/
-.cxx/
-app/build/
-app/release/
-*.apk
-*.aab
-*.jks
-*.keystore
+# Prevent Gradle distribution from being tracked by Git
+!gradle/wrapper/gradle-wrapper.jar
