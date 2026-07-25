@@ -23,40 +23,19 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Android SDK CLI tools
-        run: |
-          # Download and install Android SDK cmdline tools
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip
-          mv cmdline-tools latest
-          echo "ANDROID_HOME=$GITHUB_WORKSPACE/latest" >> $GITHUB_ENV
-          echo "$GITHUB_WORKSPACE/latest/bin" >> $GITHUB_PATH
-          echo "Android SDK installed at $ANDROID_HOME"
-          ls -la "$ANDROID_HOME/bin/"
-
-      - name: Accept licenses
-        run: |
-          yes | sdkmanager --licenses 2>&1 | tail -5
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Install SDK components
         run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
           sdkmanager "platforms;android-34" "build-tools;34.0.0"
-          echo "Platform installed at $(ls "$ANDROID_HOME/platforms/" 2>/dev/null | head -1)"
-
-      - name: Create gradle.properties
-        run: |
-          cat > gradle.properties << EOF
-          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
-          android.useAndroidX=true
-          kotlin.code.style=official
-          android.nonTransitiveRClass=true
-          EOF
-          cat gradle.properties
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls -la "$ANDROID_HOME/platforms/" 2>/dev/null || echo "MISSING"
+          ls -la "$ANDROID_HOME/build-tools/" 2>/dev/null || echo "MISSING"
 
       - name: Write local.properties
-        run: |
-          echo "sdk.dir=${ANDROID_HOME}" > local.properties
-          cat local.properties
+        run: echo "sdk.dir=${ANDROID_HOME}" > local.properties
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
@@ -64,28 +43,25 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/gradle.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build Debug APK
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-        run: |
-          echo "=== Environment ==="
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "PATH=$PATH"
-          echo "=== Checking SDK ==="
-          ls -la "$ANDROID_HOME/platforms/android-34/" 2>/dev/null || echo "Platform not found"
-          echo "=== Gradle version ==="
-          ./gradlew --version
-          echo "=== Running assembleDebug ==="
-          ./gradlew assembleDebug --no-daemon --stacktrace -x lint
+        run: ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
 
-      - name: Check APK output
+      - name: Show APK
         if: always()
         run: |
-          find . -name "*.apk" -type f 2>/dev/null | head -10
-          ls -la app/build/outputs/apk/debug/ 2>/dev/null || echo "APK directory not found"
+          find app/build/outputs -name "*.apk" 2>/dev/null
+          ls -la app/build/outputs/apk/debug/ 2>/dev/null || echo "No APK"
+
+      - name: Upload build.log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+          retention-days: 14
 
       - name: Upload Debug APK
         if: success()
@@ -110,19 +86,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Android SDK CLI tools
-        run: |
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip
-          mv cmdline-tools latest
-          echo "ANDROID_HOME=$GITHUB_WORKSPACE/latest" >> $GITHUB_ENV
-          echo "$GITHUB_WORKSPACE/latest/bin" >> $GITHUB_PATH
-          echo "Android SDK installed at $ANDROID_HOME"
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Install SDK components
         run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
           sdkmanager "platforms;android-34" "build-tools;34.0.0"
-          echo "Platform installed"
 
       - name: Write local.properties
         run: echo "sdk.dir=${ANDROID_HOME}" > local.properties
@@ -137,15 +107,20 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Run unit tests
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-        run: |
-          ./gradlew testDebugUnitTest --no-daemon --stacktrace -x lint
+        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace 2>&1 | tee test.log
 
-      - name: Upload test results
+      - name: Upload test.log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-log
+          path: test.log
+          retention-days: 14
+
+      - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-reports
           path: app/build/reports/tests/
           retention-days: 14
